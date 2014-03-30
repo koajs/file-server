@@ -1,4 +1,5 @@
 
+var path = require('path')
 var koa = require('koa')
 var assert = require('assert')
 var request = require('supertest')
@@ -8,6 +9,32 @@ var staticServer = require('..')
 var app = koa()
 app.use(staticServer())
 var server = app.listen()
+
+describe('root', function () {
+  it('should root priority than options.root', function (done) {
+    var app = koa()
+    app.use(staticServer(__dirname, {
+      root: path.dirname(__dirname)
+    }))
+    var server = app.listen();
+    request(server)
+    .get('/file-server.js')
+    .expect('content-type', 'application/javascript')
+    .expect(200, done)
+  })
+
+  it('should options.root work', function (done) {
+    var app = koa()
+    app.use(staticServer({
+      root: __dirname
+    }))
+    var server = app.listen();
+    request(server)
+    .get('/file-server.js')
+    .expect('content-type', 'application/javascript')
+    .expect(200, done)
+  })
+})
 
 describe('headers', function () {
   var etag
@@ -171,3 +198,4 @@ describe('aliases', function () {
     .expect(200, done)
   })
 })
+

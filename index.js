@@ -10,7 +10,6 @@ module.exports = function (root, options) {
   if (typeof root === 'object') {
     options = root
     root = null
-    // root = process.cwd()
   }
 
   options = options || {}
