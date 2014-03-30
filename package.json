@@ -30,7 +30,7 @@
     "supertest": "~0.10.0"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha --harmony-generators --require should --reporter spec --bail"
+    "test": "make test"
   },
   "engines": {
     "node": ">= 0.11.12"
