@@ -8,14 +8,7 @@
     "url": "http://jongleberry.com",
     "twitter": "https://twitter.com/jongleberry"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/koajs/file-server.git"
-  },
-  "bugs": {
-    "url": "https://github.com/koajs/file-server/issues",
-    "email": "me@jongleberry.com"
-  },
+  "repository": "koajs/file-server",
   "dependencies": {
     "debug": "*",
     "resolve-path": "^1.0.0",
@@ -27,13 +20,10 @@
     "co": "^3.0.5",
     "should": "^3.0",
     "mocha": "^1.13",
-    "supertest": "~0.10.0"
+    "supertest": "0"
   },
   "scripts": {
-    "test": "make test"
-  },
-  "engines": {
-    "node": ">= 0.11.12"
+    "test": "NODE_ENV=test mocha --harmony-generators --require should --reporter spec --bail"
   },
   "license": "MIT"
 }

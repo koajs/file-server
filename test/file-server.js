@@ -198,4 +198,3 @@ describe('aliases', function () {
     .expect(200, done)
   })
 })
-

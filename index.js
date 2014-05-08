@@ -35,7 +35,8 @@ module.exports = function (root, options) {
     yield* next
 
     // response is handled
-    if (this.response.status) return
+    if (this.response.body) return
+    if (this.response.status !== 404) return
 
     yield* send.call(this)
   }
@@ -84,13 +85,7 @@ module.exports = function (root, options) {
     // so we calculate the etag using crypto
     var buf = yield hash(path, algorithm)
     this.response.etag = buf.toString(encoding)
-
-    if (this.request.fresh) {
-      // destroy the stream if it exists
-      var body = this.response.body
-      if (body) body.destroy()
-      this.response.status = 304
-    }
+    if (this.request.fresh) this.response.status = 304
 
     return stats
   }
