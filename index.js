@@ -1,10 +1,18 @@
 
-var sendfile = require('koa-sendfile')
 var resolve = require('resolve-path')
 var hash = require('hash-stream')
 var Path = require('path')
+var fs = require('mz/fs')
+
+var extname = Path.extname
+var basename = Path.basename
 
 var methods = 'HEAD,GET,OPTIONS'
+var notfound = {
+  ENOENT: true,
+  ENAMETOOLONG: true,
+  ENOTDIR: true,
+}
 
 module.exports = function (root, options) {
   if (typeof root === 'object') {
@@ -28,6 +36,7 @@ module.exports = function (root, options) {
   serve.send = send
   return serve
 
+  // middleware
   function* serve(next) {
     yield* next
 
@@ -35,11 +44,12 @@ module.exports = function (root, options) {
     if (this.response.body) return
     if (this.response.status !== 404) return
 
-    yield* send.call(this)
+    yield* send(this)
   }
 
-  function* send(path) {
-    path = path || this.request.path.slice(1) || ''
+  // utility
+  function* send(ctx, path) {
+    path = path || ctx.request.path.slice(1) || ''
 
     // index file support
     var directory = path === '' || path.slice(-1) === '/'
@@ -51,37 +61,54 @@ module.exports = function (root, options) {
     // hidden file support
     if (!hidden && leadingDot(path)) return
 
-    var stats = yield* sendfile.call(this, path)
+    var stats = yield* stat(path)
     if (!stats || !stats.isFile()) return // 404
     stats.path = path
 
-    if (cachecontrol) this.response.set('Cache-Control', cachecontrol)
-
     // proper method handling
-    switch (this.request.method) {
+    var method = ctx.request.method
+    switch (method) {
       case 'HEAD':
       case 'GET':
         break // continue
       case 'OPTIONS':
-        this.response.set('Allow', methods)
-        this.response.status = 204
+        ctx.response.set('Allow', methods)
+        ctx.response.status = 204
         return stats
       default:
-        this.response.set('Allow', methods)
-        this.response.status = 405
+        ctx.response.set('Allow', methods)
+        ctx.response.status = 405
         return stats
     }
 
-    // koa-sendfile only checks last modified,
-    // so we calculate the etag using crypto
-    var buf = yield hash(path, algorithm)
-    this.response.etag = buf.toString(encoding)
-    if (this.request.fresh) this.response.status = 304
+    ctx.response.status = 200
+    ctx.response.etag = yield* calculate(path)
+    ctx.response.lastModified = stats.mtime
+    ctx.response.length = stats.size
+    ctx.response.type = extname(path)
+
+    if (cachecontrol) ctx.response.set('Cache-Control', cachecontrol)
+    if (ctx.request.fresh) ctx.response.status = 304
+    else if (method === 'GET') ctx.response.body = fs.createReadStream(path)
 
     return stats
+  }
+
+  function* calculate(path) {
+    return (yield hash(path, algorithm)).toString(encoding)
+  }
+}
+
+function* stat(filename) {
+  try {
+    return yield fs.stat(filename)
+  } catch (err) {
+    if (notfound[err.code]) return
+    err.status = 500
+    throw err
   }
 }
 
 function leadingDot(path) {
-  return '.' === Path.basename(path)[0]
+  return '.' === basename(path)[0]
 }

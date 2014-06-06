@@ -10,10 +10,10 @@
   },
   "repository": "koajs/file-server",
   "dependencies": {
+    "mz": "0",
     "debug": "*",
-    "resolve-path": "^1.0.0",
-    "koa-sendfile": "^1.0.0",
-    "hash-stream": "^1.0.0"
+    "hash-stream": "^1.0.0",
+    "resolve-path": "^1.0.0"
   },
   "devDependencies": {
     "koa": "*",

@@ -31,7 +31,7 @@ Options are:
 - `index` - serve `index.html` files
 - `hidden` <false> - show hidden files which leading `.`s
 
-### stats = yield* send.call(this, [path])
+### var stats = yield* send(this, [path])
 
 `var serve = require('koa-file-server')(options)` returns koa middleware, but there is also `serve.send()` which will allow you to serve files on a per-file basis. This is helpful for arbitrary paths.
 
