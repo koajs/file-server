@@ -181,3 +181,18 @@ describe('malicious paths', function () {
     .expect(200, done)
   })
 })
+
+describe('.fileServer.send()', function () {
+  it('should send a file', function (done) {
+    app.use(function* (next) {
+      if (this.request.path !== '/asdfasdf.js') return yield* next
+
+      yield* this.fileServer.send('test/file-server.js')
+    })
+
+    request(app.listen())
+    .get('/asdfasdf.js')
+    .expect('content-type', /application\/javascript/)
+    .expect(200, done)
+  })
+})

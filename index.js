@@ -33,11 +33,22 @@ module.exports = function (root, options) {
   var index = options.index
   var hidden = options.hidden
 
+  // this.fileServer.send(), etc.
+  function FileServer(context) {
+    this.context = context
+  }
+
+  FileServer.prototype.send = function* (path) {
+    return yield* send(this.context, path)
+  }
+
   serve.send = send
   return serve
 
   // middleware
   function* serve(next) {
+    this.fileServer = new FileServer(this)
+
     yield* next
 
     // response is handled
