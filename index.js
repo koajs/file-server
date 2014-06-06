@@ -1,6 +1,6 @@
 
-var resolve = require('resolve-path')
 var sendfile = require('koa-sendfile')
+var resolve = require('resolve-path')
 var hash = require('hash-stream')
 var Path = require('path')
 
@@ -15,9 +15,6 @@ module.exports = function (root, options) {
   options = options || {}
   root = root || options.root || process.cwd()
 
-  var aliases = options.aliases
-    || options.alias
-    || Object.create(null)
   var maxage = options.maxage
   var cachecontrol = maxage != null
     ? ('public, max-age=' + (maxage / 1000 | 0))
@@ -48,14 +45,8 @@ module.exports = function (root, options) {
     var directory = path === '' || path.slice(-1) === '/'
     if (index && directory) path += 'index.html'
 
-    // lookup aliases
-    if (path in aliases) {
-      // aliases can have absolute paths
-      path = Path.resolve(root, aliases[path])
-    } else {
-      // regular paths can not be absolute
-      path = resolve(root, path)
-    }
+    // regular paths can not be absolute
+    path = resolve(root, path)
 
     // hidden file support
     if (!hidden && leadingDot(path)) return

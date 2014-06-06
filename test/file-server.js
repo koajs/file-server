@@ -19,7 +19,7 @@ describe('root', function () {
     var server = app.listen();
     request(server)
     .get('/file-server.js')
-    .expect('content-type', 'application/javascript')
+    .expect('content-type', /application\/javascript/)
     .expect(200, done)
   })
 
@@ -31,7 +31,7 @@ describe('root', function () {
     var server = app.listen();
     request(server)
     .get('/file-server.js')
-    .expect('content-type', 'application/javascript')
+    .expect('content-type', /application\/javascript/)
     .expect(200, done)
   })
 })
@@ -42,7 +42,7 @@ describe('headers', function () {
   it('should set content-* and last-modified headers', function (done) {
     request(server)
     .get('/test/file-server.js')
-    .expect('content-type', 'application/javascript')
+    .expect('content-type', /application\/javascript/)
     .expect(200, function (err, res) {
       if (err) return done(err)
 
@@ -178,23 +178,6 @@ describe('malicious paths', function () {
   it('/./', function (done) {
     request(server)
     .get('/./index.js')
-    .expect(200, done)
-  })
-})
-
-describe('aliases', function () {
-  var app = koa()
-  app.use(staticServer({
-    alias: {
-      'package': 'package.json'
-    }
-  }))
-  var server = app.listen()
-
-  it('should work', function (done) {
-    request(server)
-    .get('/package')
-    .expect('content-type', 'application/json')
     .expect(200, done)
   })
 })
