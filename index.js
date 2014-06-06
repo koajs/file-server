@@ -23,6 +23,7 @@ module.exports = function (root, options) {
   options = options || {}
   root = root || options.root || process.cwd()
 
+  var cache = Object.create(null)
   var maxage = options.maxage
   var cachecontrol = maxage != null
     ? ('public, max-age=' + (maxage / 1000 | 0))
@@ -72,9 +73,8 @@ module.exports = function (root, options) {
     // hidden file support
     if (!hidden && leadingDot(path)) return
 
-    var stats = yield* stat(path)
-    if (!stats || !stats.isFile()) return // 404
-    stats.path = path
+    var file = yield* get(path)
+    if (!file) return // 404
 
     // proper method handling
     var method = ctx.request.method
@@ -85,28 +85,42 @@ module.exports = function (root, options) {
       case 'OPTIONS':
         ctx.response.set('Allow', methods)
         ctx.response.status = 204
-        return stats
+        return file
       default:
         ctx.response.set('Allow', methods)
         ctx.response.status = 405
-        return stats
+        return file
     }
 
     ctx.response.status = 200
-    ctx.response.etag = yield* calculate(path)
-    ctx.response.lastModified = stats.mtime
-    ctx.response.length = stats.size
+    ctx.response.etag = file.etag
+    ctx.response.lastModified = file.stats.mtime
+    ctx.response.length = file.stats.size
     ctx.response.type = extname(path)
 
     if (cachecontrol) ctx.response.set('Cache-Control', cachecontrol)
     if (ctx.request.fresh) ctx.response.status = 304
     else if (method === 'GET') ctx.response.body = fs.createReadStream(path)
 
-    return stats
+    return file
   }
 
-  function* calculate(path) {
-    return (yield hash(path, algorithm)).toString(encoding)
+  // get the file from cache if possible
+  function* get(path) {
+    if (cache[path]) return cache[path]
+
+    var stats = yield* stat(path)
+    // we don't want to cache 404s because
+    // the cache object will get infinitely large
+    if (!stats || !stats.isFile()) return
+    stats.path = path
+
+    var etag = (yield hash(path, algorithm)).toString(encoding)
+
+    return cache[path] = {
+      stats: stats,
+      etag: etag,
+    }
   }
 }
 

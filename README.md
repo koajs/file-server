@@ -3,13 +3,15 @@
 
 An opinionated file server. Designed to sit behind a CDN.
 
-- Crypto-based etags and consequential 304s
+- `sha256` etags and consequential 304s
+- Caches `fs.stat()` calls and etag calculations
 - OPTIONS and 405 support
 - Index files
 - Serve hidden files
 
 Does not support:
 
+- Dynamic files - assumes static files never change
 - Directory listing
 - Path decoding
 
@@ -31,19 +33,13 @@ Options are:
 - `index` - serve `index.html` files
 - `hidden` <false> - show hidden files which leading `.`s
 
-### var stats = yield* send(this, [path])
+### var file = yield* send(this, [path])
 
-`var serve = require('koa-file-server')(options)` returns koa middleware, but there is also `serve.send()` which will allow you to serve files on a per-file basis. This is helpful for arbitrary paths.
+`var serve = require('koa-file-server')(options)` returns koa middleware,
+but there is also `serve.send()` which will allow you to serve files on a per-file basis.
+This is helpful for arbitrary paths.
 
-You must `.call(this)`. `path` defaults to `this.request.path.slice(1)`, removing the leading `/` to make the path relative.
+`path` defaults to `this.request.path.slice(1)`,
+removing the leading `/` to make the path relative.
 
-```js
-var serve = require('koa-file-server')(options)
-var send = serve.send
-
-app.use(function* (next) {
-  yield* next // process downstream middleware
-  if (this.response.status) return // response is already handled
-  yield* send.call(this) // try serving this path
-})
-```
+For an example, see the middleware's source code.
