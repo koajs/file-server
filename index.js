@@ -1,6 +1,9 @@
 
+var compressible = require('compressible')
+var lookup = require('mime-types').lookup
 var resolve = require('resolve-path')
 var hash = require('hash-stream')
+var zlib = require('zlib')
 var Path = require('path')
 var fs = require('mz/fs')
 
@@ -61,7 +64,10 @@ module.exports = function (root, options) {
 
   // utility
   function* send(ctx, path) {
-    path = path || ctx.request.path.slice(1) || ''
+    var req = ctx.request
+    var res = ctx.response
+
+    path = path || req.path.slice(1) || ''
 
     // index file support
     var directory = path === '' || path.slice(-1) === '/'
@@ -77,30 +83,43 @@ module.exports = function (root, options) {
     if (!file) return // 404
 
     // proper method handling
-    var method = ctx.request.method
+    var method = req.method
     switch (method) {
       case 'HEAD':
       case 'GET':
         break // continue
       case 'OPTIONS':
-        ctx.response.set('Allow', methods)
-        ctx.response.status = 204
+        res.set('Allow', methods)
+        res.status = 204
         return file
       default:
-        ctx.response.set('Allow', methods)
-        ctx.response.status = 405
+        res.set('Allow', methods)
+        res.status = 405
         return file
     }
 
-    ctx.response.status = 200
-    ctx.response.etag = file.etag
-    ctx.response.lastModified = file.stats.mtime
-    ctx.response.length = file.stats.size
-    ctx.response.type = extname(path)
+    res.status = 200
+    res.etag = file.etag
+    res.lastModified = file.stats.mtime
+    res.type = extname(path)
+    if (cachecontrol) res.set('Cache-Control', cachecontrol)
 
-    if (cachecontrol) ctx.response.set('Cache-Control', cachecontrol)
-    if (ctx.request.fresh) ctx.response.status = 304
-    else if (method === 'GET') ctx.response.body = fs.createReadStream(path)
+    if (req.fresh) {
+      res.status = 304
+      return file
+    }
+    
+    if (method === 'HEAD') return file
+
+    if (file.compress && req.acceptsEncodings('gzip', 'identity') === 'gzip') {
+      res.set('Content-Encoding', 'gzip')
+      res.length = file.compress.stats.size
+      res.body = fs.createReadStream(file.compress.path)
+    } else {
+      res.set('Content-Encoding', 'identity')
+      res.length = file.stats.size
+      res.body = fs.createReadStream(path)
+    }
 
     return file
   }
@@ -115,12 +134,43 @@ module.exports = function (root, options) {
     if (!stats || !stats.isFile()) return
     stats.path = path
 
-    var etag = (yield hash(path, algorithm)).toString(encoding)
-
-    return cache[path] = {
+    var file = cache[path] = {
       stats: stats,
-      etag: etag,
+      etag: (yield hash(path, algorithm)).toString(encoding),
     }
+
+    // if we can compress this file, we create a .gz
+    if (compressible(lookup(extname(path)))) {
+      var compress = file.compress = {
+        path: path + '.gz'
+      }
+
+      // delete old .gz files in case the file has been updated
+      try {
+        yield fs.unlink(compress.path)
+      } catch (err) {}
+
+      yield function (done) {
+        fs.createReadStream(path)
+        .on('error', done)
+        .pipe(zlib.createGzip())
+        .on('error', done)
+        .pipe(fs.createWriteStream(compress.path))
+        .on('error', done)
+        .on('finish', done)
+      }
+
+      compress.stats = yield fs.stat(compress.path)
+
+      // if the gzip size is larger than the original file,
+      // don't bother gzipping
+      if (compress.stats.size > stats.size) {
+        delete file.compress
+        yield fs.unlink(compress.path)
+      }
+    }
+
+    return file
   }
 }
 

@@ -182,6 +182,31 @@ describe('malicious paths', function () {
   })
 })
 
+describe('compression', function () {
+  it('should compress large files', function (done) {
+    request(server)
+    .get('/index.js')
+    .expect('Content-Encoding', 'gzip')
+    .expect('Content-Type', /application\/javascript/)
+    .expect(200, done)
+  })
+
+  it('should not compress small files', function (done) {
+    request(server)
+    .get('/test/index.html')
+    .expect('Content-Encoding', 'identity')
+    .expect('Content-Type', /text\/html/)
+    .expect(200, done)
+  })
+
+  it('should not compress uncompressible files', function (done) {
+    request(server)
+    .get('/LICENSE')
+    .expect('Content-Encoding', 'identity')
+    .expect(200, done)
+  })
+})
+
 describe('.fileServer.send()', function () {
   it('should send a file', function (done) {
     app.use(function* (next) {

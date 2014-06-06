@@ -4,10 +4,12 @@
 An opinionated file server. Designed to sit behind a CDN.
 
 - `sha256` etags and consequential 304s
-- Caches `fs.stat()` calls and etag calculations
+- Caches `fs.stat()` calls
+- Caches etag calculations
 - OPTIONS and 405 support
 - Index files
 - Serve hidden files
+- Caches gzipped versions of files
 
 Does not support:
 

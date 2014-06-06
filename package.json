@@ -12,8 +12,10 @@
   "dependencies": {
     "mz": "0",
     "debug": "*",
+    "mime-types": "^1.0.0",
     "hash-stream": "^1.0.0",
-    "resolve-path": "^1.0.0"
+    "resolve-path": "^1.0.0",
+    "compressible": "^1.1.0"
   },
   "devDependencies": {
     "koa": "*",
