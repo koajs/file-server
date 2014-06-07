@@ -12,6 +12,7 @@
   "dependencies": {
     "mz": "0",
     "debug": "*",
+    "koa-spdy-push": "0",
     "mime-types": "^1.0.0",
     "hash-stream": "^1.0.0",
     "resolve-path": "^1.0.0",
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "koa": "*",
+    "spdy": "*",
+    "spdy-keys": "*",
     "co": "^3.0.5",
     "should": "^3.0",
     "mocha": "^1.13",

@@ -1,6 +1,6 @@
 
-var path = require('path')
 var koa = require('koa')
+var path = require('path')
 var assert = require('assert')
 var request = require('supertest')
 
