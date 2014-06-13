@@ -12,6 +12,7 @@
   "dependencies": {
     "mz": "0",
     "debug": "*",
+    "node-zopfli": "1",
     "koa-spdy-push": "0",
     "mime-types": "^1.0.0",
     "hash-stream": "^1.0.0",
