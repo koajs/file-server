@@ -193,35 +193,40 @@ module.exports = function (root, options) {
       type: mime.contentType(extname(path)) || 'application/octet-stream',
     }
 
+    if (!compressible(file.type)) return file
+
     // if we can compress this file, we create a .gz
-    if (compressible(file.type)) {
-      var compress = file.compress = {
-        path: path + '.gz'
-      }
+    var compress = file.compress = {
+      path: path + '.gz'
+    }
 
-      // delete old .gz files in case the file has been updated
-      try {
-        yield fs.unlink(compress.path)
-      } catch (err) {}
+    // delete old .gz files in case the file has been updated
+    try {
+      yield fs.unlink(compress.path)
+    } catch (err) {}
 
-      yield function (done) {
-        fs.createReadStream(path)
-        .on('error', done)
-        .pipe(zlib.createGzip())
-        .on('error', done)
-        .pipe(fs.createWriteStream(compress.path))
-        .on('error', done)
-        .on('finish', done)
-      }
+    // save to a random file name first
+    var tmp = path + '.' + random() + '.gz'
+    yield function (done) {
+      fs.createReadStream(path)
+      .on('error', done)
+      .pipe(zlib.createGzip())
+      .on('error', done)
+      .pipe(fs.createWriteStream(tmp))
+      .on('error', done)
+      .on('finish', done)
+    }
 
-      compress.stats = yield fs.stat(compress.path)
+    compress.stats = yield fs.stat(tmp)
 
-      // if the gzip size is larger than the original file,
-      // don't bother gzipping
-      if (compress.stats.size > stats.size) {
-        delete file.compress
-        yield fs.unlink(compress.path)
-      }
+    // if the gzip size is larger than the original file,
+    // don't bother gzipping
+    if (compress.stats.size > stats.size) {
+      delete file.compress
+      yield fs.unlink(tmp)
+    } else {
+      // otherwise, rename to the correct path
+      yield fs.rename(tmp, compress.path)
     }
 
     return file
@@ -240,4 +245,8 @@ function* stat(filename) {
 
 function leadingDot(path) {
   return '.' === basename(path)[0]
+}
+
+function random() {
+  return Math.random().toString(36).slice(2)
 }
