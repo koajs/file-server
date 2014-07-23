@@ -1,7 +1,7 @@
 {
   "name": "koa-file-server",
   "description": "file serving middleware for koa",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "author": {
     "name": "Jonathan Ong",
     "email": "me@jongleberry.com",
@@ -34,5 +34,7 @@
     "test-travis": "node --harmony-generators node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter dot --require should"
   },
   "license": "MIT",
-  "files": ["index.js"]
+  "files": [
+    "index.js"
+  ]
 }
