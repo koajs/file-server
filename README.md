@@ -1,6 +1,11 @@
 
 # Koa File Server
 
+[![NPM version][npm-image]][npm-url]
+[![build status][travis-image]][travis-url]
+[![Test coverage][coveralls-image]][coveralls-url]
+[![Gittip][gittip-image]][gittip-url]
+
 An opinionated file server. Designed to sit behind a CDN.
 
 - `sha256` etags and consequential 304s
@@ -66,3 +71,12 @@ Unlike `send()`, `path` is required.
 The push stream's URL will be `'/' + path`.
 Errors will be thrown on unknown files.
 The only `option` is `priority: 7`.
+
+[npm-image]: https://img.shields.io/npm/v/koa-file-server.svg?style=flat
+[npm-url]: https://npmjs.org/package/koa-file-server
+[travis-image]: https://img.shields.io/travis/koajs/file-server.svg?style=flat
+[travis-url]: https://travis-ci.org/koajs/file-server
+[coveralls-image]: https://img.shields.io/coveralls/koajs/file-server.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/koajs/file-server?branch=master
+[gittip-image]: https://img.shields.io/gittip/jonathanong.svg?style=flat
+[gittip-url]: https://www.gittip.com/jonathanong/
