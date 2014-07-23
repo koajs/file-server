@@ -10,9 +10,8 @@
   },
   "repository": "koajs/file-server",
   "dependencies": {
-    "mz": "0",
+    "mz": "1",
     "debug": "*",
-    "node-zopfli": "1",
     "koa-spdy-push": "0",
     "mime-types": "^1.0.0",
     "hash-stream": "^1.0.0",
@@ -23,9 +22,9 @@
     "koa": "*",
     "spdy": "*",
     "spdy-keys": "*",
-    "co": "^3.0.5",
-    "should": "^3.0",
-    "mocha": "^1.13",
+    "co": "3",
+    "should": "3",
+    "mocha": "1",
     "supertest": "0"
   },
   "scripts": {
