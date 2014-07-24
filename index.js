@@ -237,6 +237,8 @@ function* stat(filename) {
   try {
     return yield fs.stat(filename)
   } catch (err) {
+    // bluebird shit
+    if (err.cause && err.cause instanceof Error) err = err.cause
     if (notfound[err.code]) return
     err.status = 500
     throw err

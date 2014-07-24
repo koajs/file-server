@@ -19,6 +19,7 @@
     "compressible": "^1.1.0"
   },
   "devDependencies": {
+    "bluebird": "2",
     "koa": "*",
     "spdy": "*",
     "spdy-keys": "*",

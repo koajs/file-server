@@ -221,3 +221,17 @@ describe('.fileServer.send()', function () {
     .expect(200, done)
   })
 })
+
+describe('404s', function () {
+  it('should return 404', function (done) {
+    app.use(function* (next) {
+      if (this.request.path !== '/404') return yield* next
+
+      yield* this.fileServer.send('lkjasldfjasdf.js')
+    })
+
+    request(app.listen())
+    .get('/404')
+    .expect(404, done)
+  })
+})
