@@ -19,7 +19,8 @@ An opinionated file server. Designed to sit behind a CDN.
 
 Does not support:
 
-- Dynamic files - assumes static files never change
+- Dynamic files - assumes static files never change.
+  You will have to delete files from the cache yourself if files change.
 - Directory listing
 - Path decoding
 

@@ -53,6 +53,7 @@ module.exports = function (root, options) {
 
   serve.send = send
   serve.push = push
+  serve.cache = cache
   return serve
 
   // middleware
