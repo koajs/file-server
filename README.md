@@ -16,7 +16,6 @@ An opinionated file server. Designed to sit behind a CDN.
 - Optionally serve hidden files
 - Caches gzipped versions of files
 - SPDY Push support
-- Use [node-zopfli](https://github.com/pierreinglebert/node-zopfli) for better compression
 
 Does not support:
 
