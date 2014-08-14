@@ -1,4 +1,5 @@
 
+var fs = require('fs')
 var koa = require('koa')
 var path = require('path')
 var assert = require('assert')
@@ -233,5 +234,27 @@ describe('404s', function () {
     request(app.listen())
     .get('/404')
     .expect(404, done)
+  })
+})
+
+describe('if .gz file is no longer existed', function () {
+  it('should create it again', function (done) {
+    var app = koa()
+    app.use(staticServer(__dirname, {
+      root: path.dirname(__dirname)
+    }))
+    request(app.callback())
+    .get('/spdy.js')
+    .expect('Content-Encoding', 'gzip')
+    .expect('content-type', /application\/javascript/)
+    .expect(200, function() {
+      fs.unlink(path.join(__dirname, 'spdy.js.gz'), function() {
+        request(app.callback())
+        .get('/spdy.js')
+        .expect('Content-Encoding', 'gzip')
+        .expect('content-type', /application\/javascript/)
+        .expect(200, done)        
+      })
+    })
   })
 })
