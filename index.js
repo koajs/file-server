@@ -180,7 +180,7 @@ module.exports = function (root, options) {
 
   // get the file from cache if possible
   function* get(path) {
-    if (cache[path]) return cache[path]
+    if (cache[path] && (yield fs.exists(cache[path].compress.path))) return cache[path]
 
     var stats = yield* stat(path)
     // we don't want to cache 404s because
