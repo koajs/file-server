@@ -180,7 +180,8 @@ module.exports = function (root, options) {
 
   // get the file from cache if possible
   function* get(path) {
-    if (cache[path] && (yield fs.exists(cache[path].compress.path))) return cache[path]
+    var val = cache[path]
+    if (val && val.compress && (yield fs.exists(val.compress.path))) return val
 
     var stats = yield* stat(path)
     // we don't want to cache 404s because
@@ -237,9 +238,9 @@ module.exports = function (root, options) {
 function* stat(filename) {
   try {
     return yield fs.stat(filename)
-  } catch (err) {
+  } catch (_) {
     // bluebird shit
-    if (err.cause && err.cause instanceof Error) err = err.cause
+    var err = _.cause || _
     if (notfound[err.code]) return
     err.status = 500
     throw err
