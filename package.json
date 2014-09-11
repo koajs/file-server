@@ -13,10 +13,10 @@
     "mz": "1",
     "debug": "*",
     "koa-spdy-push": "0",
-    "mime-types": "^1.0.0",
+    "mime-types": "2",
     "hash-stream": "^1.0.0",
     "resolve-path": "^1.0.0",
-    "compressible": "^1.1.0"
+    "compressible": "2"
   },
   "devDependencies": {
     "bluebird": "2",
