@@ -4,6 +4,7 @@ var resolve = require('resolve-path')
 var hash = require('hash-stream')
 var mime = require('mime-types')
 var spdy = require('spdy-push')
+var assert = require('assert')
 var zlib = require('mz/zlib')
 var Path = require('path')
 var fs = require('mz/fs')
@@ -132,12 +133,12 @@ module.exports = function (root, options) {
   }
 
   function* push(ctx, path, opts) {
-    if (!path) throw new Error('you must define a path!')
+    assert(path, 'you must define a path!')
     if (!ctx.res.isSpdy) return
 
     opts = opts || {}
 
-    if (path[0] === '/') throw new Error('you can only push relative paths')
+    assert(path[0] !== '/', 'you can only push relative paths')
     var uri = path // original path
 
     // index file support
@@ -148,7 +149,7 @@ module.exports = function (root, options) {
     path = resolve(root, path)
 
     var file = yield* get(path)
-    if (!file) throw new Error('can not push file: ' + uri)
+    assert(file, 'can not push file: ' + uri)
 
     var options = {
       path: '/' + uri,
@@ -186,7 +187,7 @@ module.exports = function (root, options) {
     var val = cache[path]
     if (val && val.compress && (yield fs.exists(val.compress.path))) return val
 
-    var stats = yield* stat(path)
+    var stats = yield fs.stat(path).catch(ignoreStatError)
     // we don't want to cache 404s because
     // the cache object will get infinitely large
     if (!stats || !stats.isFile()) return
@@ -222,7 +223,7 @@ module.exports = function (root, options) {
       .on('finish', done)
     }
 
-    compress.stats = yield fs.stat(tmp)
+    compress.stats = yield fs.stat(tmp).catch(ignoreStatError)
 
     // if the gzip size is larger than the original file,
     // don't bother gzipping
@@ -238,16 +239,10 @@ module.exports = function (root, options) {
   }
 }
 
-function* stat(filename) {
-  try {
-    return yield fs.stat(filename)
-  } catch (_) {
-    // bluebird shit
-    var err = _.cause || _
-    if (notfound[err.code]) return
-    err.status = 500
-    throw err
-  }
+function ignoreStatError(err) {
+  if (notfound[err.code]) return
+  err.status = 500
+  throw err
 }
 
 function leadingDot(path) {
