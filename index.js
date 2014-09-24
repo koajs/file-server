@@ -1,9 +1,9 @@
 
 var compressible = require('compressible')
-var spdyPush = require('koa-spdy-push')()
 var resolve = require('resolve-path')
 var hash = require('hash-stream')
 var mime = require('mime-types')
+var spdy = require('spdy-push')
 var zlib = require('mz/zlib')
 var Path = require('path')
 var fs = require('mz/fs')
@@ -173,7 +173,10 @@ module.exports = function (root, options) {
       options.filename = path
     }
 
-    spdyPush(ctx, options)
+    spdy(ctx.res)
+      .push(options)
+      .send()
+      .catch(ctx.onerror)
 
     return file
   }

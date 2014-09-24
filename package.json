@@ -10,13 +10,13 @@
   },
   "repository": "koajs/file-server",
   "dependencies": {
-    "mz": "1",
+    "compressible": "2",
     "debug": "*",
-    "koa-spdy-push": "0",
-    "mime-types": "2",
     "hash-stream": "^1.0.0",
+    "mime-types": "2",
+    "mz": "1",
     "resolve-path": "^1.0.0",
-    "compressible": "2"
+    "spdy-push": "^1.0.0"
   },
   "devDependencies": {
     "bluebird": "2",
