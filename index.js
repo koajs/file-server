@@ -81,11 +81,11 @@ module.exports = function (root, options) {
     var directory = path === '' || path.slice(-1) === '/'
     if (index && directory) path += 'index.html'
 
-    // regular paths can not be absolute
-    path = resolve(root, path)
-
     // hidden file support
     if (!hidden && isHidden(path)) return
+
+    // regular paths can not be absolute
+    path = resolve(root, path)
 
     var file = yield* get(path)
     if (!file) return // 404
