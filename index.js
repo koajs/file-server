@@ -246,7 +246,7 @@ function ignoreStatError(err) {
 }
 
 function isHidden(path) {
-  return /[\\\/]\./.test(path);
+  return /[\\\/]\.(?!\.[\\\/])/.test(path);
 }
 
 function random() {
