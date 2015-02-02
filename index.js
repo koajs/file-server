@@ -85,7 +85,7 @@ module.exports = function (root, options) {
     path = resolve(root, path)
 
     // hidden file support
-    if (!hidden && leadingDot(path)) return
+    if (!hidden && isHidden(path)) return
 
     var file = yield* get(path)
     if (!file) return // 404
@@ -245,8 +245,8 @@ function ignoreStatError(err) {
   throw err
 }
 
-function leadingDot(path) {
-  return '.' === basename(path)[0]
+function isHidden(path) {
+  return /[\\\/]\./.test(path);
 }
 
 function random() {
