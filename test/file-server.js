@@ -167,7 +167,7 @@ describe('malicious paths', function () {
   it('..', function (done) {
     request(server)
     .get('/../klajsdfkljasdf')
-    .expect(400, done)
+    .expect(403, done)
   })
 
   it('//', function (done) {
@@ -253,7 +253,7 @@ describe('if .gz file is no longer existed', function () {
         .get('/spdy.js')
         .expect('Content-Encoding', 'gzip')
         .expect('content-type', /application\/javascript/)
-        .expect(200, done)        
+        .expect(200, done)
       })
     })
   })
