@@ -250,7 +250,7 @@ function isHidden(path) {
   // [\/] matches a path separator, . matches leading dot
   // while (?!.[/\]) makes sure that something like /../ should not be matched
   // and is passed to resove-path to get the correct error response
-  return /[\\\/]\.(?!\.[\\\/])/.test(path);
+  return /(^|[\\\/])\.(?!\.[\\\/])/.test(path);
 }
 
 function random() {
