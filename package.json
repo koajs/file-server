@@ -14,20 +14,20 @@
     "debug": "*",
     "hash-stream": "^1.0.0",
     "mime-types": "2",
-    "mz": "1",
+    "mz": "^2.0.0",
     "resolve-path": "^1.0.0",
     "spdy-push": "^1.0.0"
   },
   "devDependencies": {
     "bluebird": "2",
+    "co": "3",
+    "istanbul-harmony": "0",
     "koa": "*",
+    "mocha": "^2.2.5",
+    "should": "3",
     "spdy": "*",
     "spdy-keys": "*",
-    "co": "3",
-    "should": "3",
-    "mocha": "1",
-    "supertest": "0",
-    "istanbul-harmony": "0"
+    "supertest": "^1.0.1"
   },
   "scripts": {
     "test": "NODE_ENV=test mocha --require should --reporter spec --bail",
