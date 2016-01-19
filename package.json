@@ -10,7 +10,7 @@
   },
   "repository": "koajs/file-server",
   "dependencies": {
-    "compressible": "2",
+    "compressible": "2.0.7",
     "debug": "*",
     "hash-stream": "^1.0.0",
     "mime-types": "2",
