@@ -14,7 +14,7 @@
     "debug": "*",
     "hash-stream": "^1.0.0",
     "mime-types": "2",
-    "mz": "^2.0.0",
+    "mz": "^2.2.0",
     "resolve-path": "^1.0.0",
     "spdy-push": "^1.0.0"
   },
