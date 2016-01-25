@@ -24,7 +24,7 @@
     "istanbul-harmony": "0",
     "koa": "*",
     "mocha": "^2.2.5",
-    "should": "3",
+    "should": "8.2.0",
     "spdy": "*",
     "spdy-keys": "*",
     "supertest": "^1.0.1"
