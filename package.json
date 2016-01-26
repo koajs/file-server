@@ -23,7 +23,7 @@
     "co": "3",
     "istanbul-harmony": "0",
     "koa": "*",
-    "mocha": "^2.2.5",
+    "mocha": "^2.4.1",
     "should": "3",
     "spdy": "*",
     "spdy-keys": "*",
